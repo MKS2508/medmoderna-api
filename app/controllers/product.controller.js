@@ -2,7 +2,7 @@ const db = require("../models");
 const Product = db.Products;
 const productCategory = db.productCategory;
 const imageToBase64 = require('image-to-base64');
-
+//aaa
 //helper paginacion
 const getPagination = (page, size) => {
     const limit = size ? +size : 3;
@@ -84,7 +84,7 @@ exports.findByID = async (req, res) => {
 
     try {
         console.log({id})
-        const product = await Product.findById(id);
+        const product = await Product.findOne({productId: id});
         if (product.id !== null && product.id !== undefined) {
             let cat = await productCategory.findById(product.category);
             product.category.name = cat.name;
@@ -166,6 +166,7 @@ exports.getProductsByCategory = async (req, res) => {
 
 
 };
+
 // DEVUELVE PRODUCTOS POR CATEGORIA
 exports.getProductsByBrand = async (req, res) => {
     const {page, size} = req.query;
