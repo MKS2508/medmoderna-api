@@ -5,7 +5,8 @@ const morgan = require("morgan");
 const app = express();
 const initialSetup = require("./app/libs/initialSetup")
 var corsOptions = {
-  origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.1.150:3000"]
+  origin: '*'
+  // origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.1.150:3000"]
 };
 initialSetup.createProductCategories().then();
 app.use(cors(corsOptions));
