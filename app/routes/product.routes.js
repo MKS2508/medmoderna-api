@@ -6,7 +6,7 @@ module.exports = products => {
   var router = require("express").Router();
 
   // Create a new Product
-  router.post("/",[authJwt.verifyToken], Products.create);
+  router.post("/", Products.create);
 
   // Retrieve all Products
   router.get("/", Products.findAll);
