@@ -222,16 +222,21 @@ exports.getProductsByBrand = async (req, res) => {
 
 };
 
-// DEVUELVE PRODUCTOS POR CATEGORIA
+// DEVUELVE PRODUCTOS POR BUSQUEDA
 exports.getProductsBySearchQuery = async (req, res) => {
     const {page, size} = req.query;
     const {limit, offset} = getPagination(page, size);
     try {
-        const query = req.params.searchQuery;
-        if (brand.length < 1) return;
+        const query = req.params.search;
+        console.log({query})
         try {
-            const productPaginate = await Product.paginate({name: `/${query}/i`}, {offset, limit});
+            const productPaginate = await Product.paginate({$or : [{name: { $regex: query.toUpperCase() }}, {brand: { $regex: query.toUpperCase()}}]}, {offset, limit});
             let products = productPaginate.docs
+            console.log("llega")
+            console.log(products.length)
+            if (products.length < 1) {
+                throw new Error("nope")
+            }
             let productsFixed = [];
             products.map(async (product, index) => {
                 const cat = await productCategory.findById(product.category);

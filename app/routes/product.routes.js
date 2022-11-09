@@ -20,7 +20,7 @@ module.exports = products => {
   router.get("/:id", Products.findByID);
 
   // Retrieve a single Product with id
-  router.get("/search/:searchQuery", Products.getProductsBySearchQuery);
+  router.get("/search/:search", Products.getProductsBySearchQuery);
 
   // Update a Product with id
   router.put("/:id",[authJwt.verifyToken], Products.update);
