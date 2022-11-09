@@ -19,6 +19,9 @@ module.exports = products => {
   // Retrieve a single Product with id
   router.get("/:id", Products.findByID);
 
+  // Retrieve a single Product with id
+  router.get("/search/:searchQuery", Products.getProductsBySearchQuery);
+
   // Update a Product with id
   router.put("/:id",[authJwt.verifyToken], Products.update);
 

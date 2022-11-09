@@ -222,6 +222,61 @@ exports.getProductsByBrand = async (req, res) => {
 
 };
 
+// DEVUELVE PRODUCTOS POR CATEGORIA
+exports.getProductsBySearchQuery = async (req, res) => {
+    const {page, size} = req.query;
+    const {limit, offset} = getPagination(page, size);
+    try {
+        const query = req.params.searchQuery;
+        if (brand.length < 1) return;
+        try {
+            const productPaginate = await Product.paginate({name: `/${query}/i`}, {offset, limit});
+            let products = productPaginate.docs
+            let productsFixed = [];
+            products.map(async (product, index) => {
+                const cat = await productCategory.findById(product.category);
+                let productFixed = {
+                    name: product.name,
+                    description: product.description,
+                    price: product.price,
+                    category: {
+                        name: cat.name,
+                        totalProducts: productPaginate.totalDocs
+                    },
+                    productId: product.productId,
+                    brand: product.brand,
+                    imgSrc: product.imgSrc
+                };
+                productsFixed.push(productFixed);
+                console.log({index})
+                if (index === products.length - 1) {
+                    res.send({
+                        totalItems: productPaginate.totalDocs,
+                        products: productsFixed,
+                        totalPages: productPaginate.totalPages,
+                        currentPage: productPaginate.page - 1,
+                    });
+                }
+            })
+
+
+        } catch (err) {
+            res.status(500).send({
+                message:
+                    err.message || "Some error occurred while retrieving products.",
+            });
+        }
+    } catch (e) {
+        res.status(500).send({
+            message:
+                e.message || "Some error occurred while retrieving products.",
+            message2: "Some error occurred in category" + req.params.category,
+        });
+    }
+
+
+};
+
 // ACTUALIZA PRODUCTO POR ID
 exports.update = async (req, res) => {
     if (!req.body) {
