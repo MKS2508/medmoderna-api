@@ -2,6 +2,8 @@ const db = require("../models");
 const Product = db.Products;
 const productCategory = db.productCategory;
 const imageToBase64 = require('image-to-base64');
+const gis = require('async-g-i-s');
+
 //aaa
 //helper paginacion
 const getPagination = (page, size) => {
@@ -64,6 +66,27 @@ exports.findAll = async (req, res) => {
             }),
             totalPages: productPaginate.totalPages,
             currentPage: productPaginate.page - 1,
+        });
+    } catch (err) {
+        res.status(500).send({
+            message:
+                err.message || "Some error occurred while retrieving Products.",
+        });
+
+    }
+
+
+};
+
+// DEVUELVE TODOS LOS PRODUCTOS
+exports.getRelatedImages = async (req, res) => {
+    const {title} = req.query;
+    const results = await gis(title);
+    console.log(results.slice(0, 10));
+    let images = results.slice(0,10)
+    try {
+        res.send({
+            images
         });
     } catch (err) {
         res.status(500).send({

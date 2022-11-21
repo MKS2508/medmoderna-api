@@ -10,6 +10,7 @@ module.exports = products => {
 
   // Retrieve all Products
   router.get("/", Products.findAll);
+  router.get("/images/:title", Products.getRelatedImages);
 
   // Retrieve all published Products
   router.get("/category/:category", Products.getProductsByCategory);
