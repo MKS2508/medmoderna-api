@@ -86,7 +86,7 @@ exports.getRelatedImages = async (req, res) => {
     let images = results.slice(0,10)
     try {
         res.send({
-            images
+            images:images
         });
     } catch (err) {
         res.status(500).send({
