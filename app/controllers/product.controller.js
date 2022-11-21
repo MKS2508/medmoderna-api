@@ -80,7 +80,8 @@ exports.findAll = async (req, res) => {
 
 // DEVUELVE TODOS LOS PRODUCTOS
 exports.getRelatedImages = async (req, res) => {
-    const {title} = req.query;
+    const title = req.params.title;
+    console.log({title})
     const results = await gis(title);
     console.log(results.slice(0, 10));
     let images = results.slice(0,10)
