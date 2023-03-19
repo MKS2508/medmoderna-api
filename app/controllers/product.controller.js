@@ -59,7 +59,7 @@ exports.create = async (req, res) => {
 // DEVUELVE TODOS LOS PRODUCTOS
 exports.findAll = async (req, res) => {
     const {title, page, size} = req.query;
-    const pageNumber = parseInt(page) + 1; // Incrementa en 1 el valor de la página
+    const pageNumber = parseInt(page) + 0; // Incrementa en 1 el valor de la página
     const {limit, offset} = getPagination(pageNumber, size);
 
     const condition = title
@@ -75,7 +75,7 @@ exports.findAll = async (req, res) => {
                 name: product.name,
                 description: product.description,
                 price: product.price,
-                category: product.category ? product.category.name : "N/A",
+                category: product.category ? product.category.name : "CBD",
                 productId: product.productId,
                 brand: product.brand,
                 imgSrc: product.imgSrc,
@@ -88,11 +88,11 @@ exports.findAll = async (req, res) => {
 
     try {
         const productPaginate = await Product.paginate(condition, {offset, limit});
-        const products = await fixProducts(productPaginate);
+        const productsFixed = await fixProducts(productPaginate);
 
         res.send({
             totalItems: productPaginate.totalDocs,
-            products,
+            products: productsFixed,
             totalPages: productPaginate.totalPages,
             currentPage: productPaginate.page - 1,
         });
