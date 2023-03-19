@@ -22,7 +22,14 @@ exports.create = async (req, res) => {
     }
 
     // Create a Product
-    let imgBase64 = await imageToBase64(req.body.imgSrc);
+    let imgBase64;
+    if (req.body.imgSrc && req.body.imgSrc.length >200) {
+        imgBase64 = req.body.imgSrc
+
+    } else {
+        imgBase64 = await imageToBase64(req.body.imgSrc);
+
+    }
     let category = await productCategory.findOne({name: req.body.category})
     const product = new Product({
         name: req.body.name,
@@ -58,11 +65,14 @@ exports.findAll = async (req, res) => {
 
     const {limit, offset} = getPagination(page, size);
     try {
-        const productPaginate = await Product.paginate(condition, {offset, limit});
+        const productPaginate = await Product.paginate(condition, { offset, limit });
         res.send({
             totalItems: productPaginate.totalDocs,
             products: productPaginate.docs.map((item) => {
-                item.category = category.name
+                return {
+                    ...item.toObject(),
+                    category: item.category.name,
+                };
             }),
             totalPages: productPaginate.totalPages,
             currentPage: productPaginate.page - 1,
