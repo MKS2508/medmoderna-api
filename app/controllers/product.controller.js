@@ -59,7 +59,8 @@ exports.create = async (req, res) => {
 // DEVUELVE TODOS LOS PRODUCTOS
 exports.findAll = async (req, res) => {
     const {title, page, size} = req.query;
-    const {limit, offset} = getPagination(page, size);
+    const pageNumber = parseInt(page) + 1; // Incrementa en 1 el valor de la página
+    const {limit, offset} = getPagination(pageNumber, size);
 
     const condition = title
         ? {title: {$regex: new RegExp(title), $options: "i"}}
