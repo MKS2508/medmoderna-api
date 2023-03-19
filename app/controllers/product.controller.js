@@ -67,10 +67,11 @@ exports.findAll = async (req, res) => {
         const allProducts = await Product.find(condition).populate("category");
         const formattedProducts = allProducts.map((item) => {
             return {
-                ...item.toObject(),
-                category: item.category.name,
+                ...item,
+                category: item.category ? item.category.name : "N/A",
             };
         });
+
 
         res.send({
             totalItems: formattedProducts.length,
