@@ -58,20 +58,20 @@ exports.create = async (req, res) => {
 
 // DEVUELVE TODOS LOS PRODUCTOS
 exports.findAll = async (req, res) => {
-    const {title} = req.query;
-    var condition = title
-        ? {title: {$regex: new RegExp(title), $options: "i"}}
+    const { title } = req.query;
+    const condition = title
+        ? { title: { $regex: new RegExp(title), $options: "i" } }
         : {};
 
     try {
-        const allProducts = await Product.find(condition).populate("category");
+        const allProducts = await Product.find(condition).populate("category").exec();
         const formattedProducts = allProducts.map((item) => {
+            const productObj = item.toObject();
             return {
-                ...item.toObject(),
-                category: item.category ? item.category.name : "N/A",
+                ...productObj,
+                category: productObj.category ? productObj.category.name : "N/A",
             };
         });
-
 
         res.send({
             totalItems: formattedProducts.length,
