@@ -58,35 +58,34 @@ exports.create = async (req, res) => {
 
 // DEVUELVE TODOS LOS PRODUCTOS
 exports.findAll = async (req, res) => {
-    const {page, size, title} = req.query;
+    const {title} = req.query;
     var condition = title
         ? {title: {$regex: new RegExp(title), $options: "i"}}
         : {};
 
-    const {limit, offset} = getPagination(page, size);
     try {
-        const productPaginate = await Product.paginate(condition, { offset, limit });
+        const allProducts = await Product.find(condition).populate("category");
+        const formattedProducts = allProducts.map((item) => {
+            return {
+                ...item.toObject(),
+                category: item.category.name,
+            };
+        });
+
         res.send({
-            totalItems: productPaginate.totalDocs,
-            products: productPaginate.docs.map((item) => {
-                return {
-                    ...item.toObject(),
-                    category: item.category.name,
-                };
-            }),
-            totalPages: productPaginate.totalPages,
-            currentPage: productPaginate.page - 1,
+            totalItems: formattedProducts.length,
+            products: formattedProducts,
+            totalPages: 1,
+            currentPage: 0,
         });
     } catch (err) {
         res.status(500).send({
             message:
                 err.message || "Some error occurred while retrieving Products.",
         });
-
     }
-
-
 };
+
 
 // DEVUELVE TODOS LOS PRODUCTOS
 exports.getRelatedImages = async (req, res) => {
