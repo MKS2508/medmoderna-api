@@ -24,8 +24,8 @@ module.exports = products => {
   router.get("/search/:search", Products.getProductsBySearchQuery);
 
   // Update a Product with id
-  //router.put("/:id",/*[authJwt.verifyToken]*/, Products.update);
-  router.put("/:id",[], Products.update);
+
+  router.put("/:id", Products.update);
 
   // Delete a Product with id
   //router.delete("/:id",[authJwt.verifyToken], Products.delete);

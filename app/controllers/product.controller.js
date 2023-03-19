@@ -341,21 +341,20 @@ exports.update = async (req, res) => {
         });
     }
 
-    const id = req.params.id;
+    const productId = req.params.id;
 
     try {
-        const product = await Product.findByIdAndUpdate(id, req.body, {useFindAndModify: false});
-        if (product.id !== null && product.id !== undefined) {
+        const product = await Product.findOneAndUpdate({ productId: productId }, req.body, { useFindAndModify: false, new: true });
+        if (!product) {
             res.status(404).send({
-                message: `Cannot update Product with id=${id}. Maybe Product was not found!`,
+                message: `Cannot update Product with productId=${productId}. Maybe Product was not found!`,
             });
         } else res.send(product);
     } catch (e) {
         res.status(500).send({
-            message: "Error updating Product with id=" + id,
+            message: "Error updating Product with productId=" + productId,
         });
     }
-
 };
 
 // ELIMINA PRODUCTO POR ID
