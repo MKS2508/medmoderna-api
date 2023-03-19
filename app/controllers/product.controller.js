@@ -58,31 +58,47 @@ exports.create = async (req, res) => {
 
 // DEVUELVE TODOS LOS PRODUCTOS
 exports.findAll = async (req, res) => {
-    const { title } = req.query;
+    const {title, page, size} = req.query;
+    const {limit, offset} = getPagination(page, size);
+
     const condition = title
-        ? { title: { $regex: new RegExp(title), $options: "i" } }
+        ? {title: {$regex: new RegExp(title), $options: "i"}}
         : {};
 
-    try {
-        const allProducts = await Product.find(condition).populate("category").exec();
-        const formattedProducts = allProducts.map((item) => {
-            const productObj = item.toObject();
-            return {
-                ...productObj,
-                category: productObj.category ? productObj.category.name : "N/A",
+    const fixProducts = async (productPaginate) => {
+        let products = productPaginate.docs;
+        let productsFixed = [];
+
+        products.map((product) => {
+            let productFixed = {
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                category: product.category ? product.category.name : "N/A",
+                productId: product.productId,
+                brand: product.brand,
+                imgSrc: product.imgSrc,
             };
+            productsFixed.push(productFixed);
         });
 
+        return productsFixed;
+    };
+
+    try {
+        const productPaginate = await Product.paginate(condition, {offset, limit});
+        const products = await fixProducts(productPaginate);
+
         res.send({
-            totalItems: formattedProducts.length,
-            products: formattedProducts,
-            totalPages: 1,
-            currentPage: 0,
+            totalItems: productPaginate.totalDocs,
+            products,
+            totalPages: productPaginate.totalPages,
+            currentPage: productPaginate.page - 1,
         });
     } catch (err) {
         res.status(500).send({
             message:
-                err.message || "Some error occurred while retrieving Products.",
+                err.message || "Some error occurred while retrieving products.",
         });
     }
 };
