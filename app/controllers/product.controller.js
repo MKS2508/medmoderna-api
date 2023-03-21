@@ -55,7 +55,6 @@ exports.create = async (req, res) => {
     });
 };
 
-
 // DEVUELVE TODOS LOS PRODUCTOS
 exports.findAll = async (req, res) => {
     const {title, page, size} = req.query;
@@ -402,17 +401,18 @@ exports.delete = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const product = await Product.findByIdAndRemove(id, {useFindAndModify: false});
-        if (product.id !== null && product.id !== undefined) {
+        const productFind = await Product.findOne({productId: id});
+
+        const product = await Product.findByIdAndRemove(productFind._id, {useFindAndModify: false});
+        if (!product) {
             res.status(404).send({
                 message: `Cannot delete Product with id=${id}. Maybe Product was not found!`,
             });
-        } else res.send(product);
+        } else res.status(200).send(product);
     } catch (e) {
         res.status(500).send({
             message: "Error deleting Product with id=" + id,
         });
     }
-
 };
 
