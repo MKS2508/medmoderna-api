@@ -37,6 +37,9 @@ module.exports = (mongoose, mongoosePaginate) => {
           imgSrc: {
               type: String,
           },
+          imgSrc2: {
+              type: String,
+          },
 
       },
     { timestamps: true }

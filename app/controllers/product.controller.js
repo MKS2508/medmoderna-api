@@ -3,6 +3,7 @@ const Product = db.Products;
 const productCategory = db.productCategory;
 const imageToBase64 = require('image-to-base64');
 const gis = require('async-g-i-s');
+const formidable = require('formidable');
 
 //aaa
 //helper paginacion
@@ -15,46 +16,45 @@ const getPagination = (page, size) => {
 
 // CREA PRODUCTO
 exports.create = async (req, res) => {
-    // Validate request
-    if (!req.body.name) {
-        res.status(400).send({message: "Content can not be empty!"});
-        return;
-    }
+    const form = new formidable.IncomingForm();
 
-    // Create a Product
-    let imgBase64;
-    if (req.body.imgSrc && req.body.imgSrc.length >200) {
-        imgBase64 = req.body.imgSrc
+    form.parse(req, async (err, fields, files) => {
+        if (err) {
+            return res.status(400).send({ message: "Error processing form data." });
+        }
 
-    } else {
-        imgBase64 = await imageToBase64(req.body.imgSrc);
+        if (!fields.name) {
+            res.status(400).send({ message: "Content can not be empty!" });
+            return;
+        }
 
-    }
-    let category = await productCategory.findOne({name: req.body.category})
-    const product = new Product({
-        name: req.body.name,
-        description: req.body.description,
-        price: req.body.price,
-        brand: req.body.brand,
-        category: category,
-        productId: req.body.productId,
-        imgSrc: imgBase64
-    });
+        const productData = fields;
 
-    try {
-        const saveProduct = await product.save(product);
-        res.send(saveProduct);
-    } catch (err) {
-        res.status(500).send({
-            message:
-                err.message || "Some error occurred while creating the Product.",
+        try {
+            productData.imgSrc = await processImageField(productData.imgSrc);
+            productData.imgSrc2 = await processImageField(productData.imgSrc2);
+        } catch (error) {
+            return res.status(400).send({ message: "Error processing image data." });
+        }
+
+        let category = await productCategory.findOne({ name: productData.category });
+        const product = new Product({
+            ...productData,
+            category: category,
         });
-    }
 
-
-    // Save Product in the database
-
+        try {
+            const saveProduct = await product.save(product);
+            res.send(saveProduct);
+        } catch (err) {
+            res.status(500).send({
+                message:
+                    err.message || "Some error occurred while creating the Product.",
+            });
+        }
+    });
 };
+
 
 // DEVUELVE TODOS LOS PRODUCTOS
 exports.findAll = async (req, res) => {
@@ -87,7 +87,11 @@ exports.findAll = async (req, res) => {
     };
 
     try {
-        const productPaginate = await Product.paginate(condition, {offset, limit});
+        const productPaginate = await Product.paginate(condition, {
+            offset,
+            limit,
+            populate: 'category', // Agrega esta línea para poblar la información de la categoría
+        });
         const productsFixed = await fixProducts(productPaginate);
 
         res.send({
@@ -98,10 +102,10 @@ exports.findAll = async (req, res) => {
         });
     } catch (err) {
         res.status(500).send({
-            message:
-                err.message || "Some error occurred while retrieving products.",
+            message: err.message || "Some error occurred while retrieving products.",
         });
     }
+
 };
 
 
@@ -342,20 +346,50 @@ exports.update = async (req, res) => {
     }
 
     const productId = req.params.id;
+    const form = new formidable.IncomingForm();
 
-    try {
-        const product = await Product.findOneAndUpdate({ productId: productId }, req.body, { useFindAndModify: false, new: true });
-        if (!product) {
-            res.status(404).send({
-                message: `Cannot update Product with productId=${productId}. Maybe Product was not found!`,
+    form.parse(req, async (err, fields, files) => {
+        if (err) {
+            return res.status(400).send({ message: "Error processing form data." });
+        }
+
+        const productData = fields;
+
+        // Handle imgSrc and imgSrc2
+        try {
+            productData.imgSrc = await processImageField(productData.imgSrc);
+            productData.imgSrc2 = await processImageField(productData.imgSrc2);
+        } catch (error) {
+            return res.status(400).send({ message: "Error processing image data." });
+        }
+
+        try {
+            const product = await Product.findOneAndUpdate(
+                { productId: productId },
+                productData,
+                { useFindAndModify: false, new: true }
+            );
+            if (!product) {
+                res.status(404).send({
+                    message: `Cannot update Product with productId=${productId}. Maybe Product was not found!`,
+                });
+            } else res.send(product);
+        } catch (e) {
+            res.status(500).send({
+                message: "Error updating Product with productId=" + productId,
             });
-        } else res.send(product);
-    } catch (e) {
-        res.status(500).send({
-            message: "Error updating Product with productId=" + productId,
-        });
-    }
+        }
+    });
 };
+
+async function processImageField(imageField) {
+    if (imageField && imageField.length > 200) {
+        return imageField; // Assume it's already in Base64 format
+    } else if (imageField && imageField.startsWith("http")) {
+        return await imageToBase64(imageField);
+    }
+    return '';
+}
 
 // ELIMINA PRODUCTO POR ID
 exports.delete = async (req, res) => {
