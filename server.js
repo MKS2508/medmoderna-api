@@ -2,6 +2,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const morgan = require("morgan");
+const compression = require("compression");
+
+// ... tus otros middlewares (bodyParser, etc.)
+
+
+
 const app = express();
 const initialSetup = require("./app/libs/initialSetup")
 var corsOptions = {
@@ -31,6 +37,22 @@ db.mongoose
     process.exit();
   });
 
+
+// Configura el middleware para servir archivos estáticos comprimidos
+app.use(compression());
+
+// Configura el middleware para servir archivos estáticos y mostrar un mensaje de error si algo sale mal
+app.use("/api/static", express.static("public", {
+    fallthrough: false,
+    setHeaders: function (res, path, stat) {
+        res.set('Cache-Control', 'public, max-age=3600');
+    }
+}), function (err, req, res, next) {
+    console.error("Error al servir archivos estáticos:", err);
+    res.status(404).send("Archivo no encontrado");
+});
+
+// ... tus rutas (app.get, require, etc.)
 // simple route
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to medicina moderna REST-API application." });
