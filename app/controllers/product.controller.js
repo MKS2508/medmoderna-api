@@ -4,6 +4,9 @@ const productCategory = db.productCategory;
 const imageToBase64 = require('image-to-base64');
 const gis = require('async-g-i-s');
 const formidable = require('formidable');
+const util = require('util');
+const fs = require('fs');
+const unlinkFile = util.promisify(fs.unlink);
 
 //aaa
 //helper paginacion
@@ -14,7 +17,19 @@ const getPagination = (page, size) => {
     return {limit, offset};
 };
 
-// CREA PRODUCTO
+async function processImageField(imageFile) {
+    console.log('Processing imageFile:', imageFile); // Agregar esta línea
+    if (imageFile) {
+        const base64 = fs.readFileSync(imageFile.filepath, 'base64');
+        console.log("convertida en base64")
+        await unlinkFile(imageFile.filepath); // Eliminar el archivo temporal después de su uso
+        console.log("ulink")
+
+        return `data:${imageFile.type};base64,${base64}`;
+    }
+    return '';
+}
+
 exports.create = async (req, res) => {
     const form = new formidable.IncomingForm();
 
@@ -31,11 +46,17 @@ exports.create = async (req, res) => {
         const productData = fields;
 
         try {
-            productData.imgSrc = await processImageField(productData.imgSrc);
-            productData.imgSrc2 = await processImageField(productData.imgSrc2);
+            if (files.imgSrc) {
+                productData.imgSrc = await processImageField(files.imgSrc);
+            }
+            if (files.imgSrc2) {
+                productData.imgSrc2 = await processImageField(files.imgSrc2);
+            }
         } catch (error) {
+            console.log('Error processing images:', error); // Agregar esta línea
             return res.status(400).send({ message: "Error processing image data." });
         }
+
 
         let category = await productCategory.findOne({ name: productData.category });
         const product = new Product({
@@ -54,8 +75,6 @@ exports.create = async (req, res) => {
         }
     });
 };
-
-// DEVUELVE TODOS LOS PRODUCTOS
 exports.findAll = async (req, res) => {
     const {title, page, size} = req.query;
     const pageNumber = parseInt(page) + 0; // Incrementa en 1 el valor de la página
@@ -381,14 +400,7 @@ exports.update = async (req, res) => {
     });
 };
 
-async function processImageField(imageField) {
-    if (imageField && imageField.length > 200) {
-        return imageField; // Assume it's already in Base64 format
-    } else if (imageField && imageField.startsWith("http")) {
-        return await imageToBase64(imageField);
-    }
-    return '';
-}
+
 
 // ELIMINA PRODUCTO POR ID
 exports.delete = async (req, res) => {

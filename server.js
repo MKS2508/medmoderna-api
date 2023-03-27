@@ -11,6 +11,7 @@ require('dotenv').config();
 
 
 
+
 const app = express();
 const initialSetup = require("./app/libs/initialSetup")
 
@@ -25,7 +26,7 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(morgan('dev'));
 // parse requests of content-type - application/json
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '100mb' }));
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -47,6 +48,7 @@ db.mongoose
 
 // Configura el middleware para servir archivos estáticos comprimidos
 app.use(compression());
+
 
 // Configura el middleware para servir archivos estáticos y mostrar un mensaje de error si algo sale mal
 app.use("/api/static", express.static("public", {
