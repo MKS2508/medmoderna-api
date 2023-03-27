@@ -1,8 +1,11 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require("cors");
 const morgan = require("morgan");
 const compression = require("compression");
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+require('dotenv').config();
+
 
 // ... tus otros middlewares (bodyParser, etc.)
 
@@ -10,11 +13,15 @@ const compression = require("compression");
 
 const app = express();
 const initialSetup = require("./app/libs/initialSetup")
-var corsOptions = {
-  origin: '*'
-  // origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.1.150:3000"]
+
+const corsOptions = {
+ // origin: '*'
+   origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.1.150:3000"],
+    credentials: true
+
 };
 initialSetup.createProductCategories().then();
+app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(morgan('dev'));
 // parse requests of content-type - application/json

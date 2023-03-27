@@ -22,24 +22,24 @@ exports.login = async (req, res) => {
 
     const token = user.createJWT()
     user.password = undefined
-    res.status(201).json({user,token})
-
+    res.cookie('token', token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: parseInt(process.env.JWT_LIFETIME) * 1000,
+    });
+    res.status(201).json({ user });
 };
 
 exports.register = async (req, res) => {
     try {
-
-        const {name,email,password} = req.body
-        const user = await User.create({name,email,password})
-        const token = user.createJWT()
-        res.status(201).json({user:{email:user.email,name:user.name},token})
-
-
-    }catch(error) {
-        res.status(500).json({msg:'an error occurred'})
+        const {name, email, password} = req.body;
+        const user = await User.create({name, email, password});
+        const token = user.createJWT();
+        res.status(201).json({user: {email: user.email, name: user.name}, token});
+    } catch (error) {
+        console.error(error); // Log the error for debugging purposes
+        res.status(500).json({msg: 'An error occurred', error: error.message || 'Unknown error'});
     }
-
-
 };
 
 

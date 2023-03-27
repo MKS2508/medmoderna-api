@@ -1,6 +1,3 @@
 module.exports = {
-
-  url: "mongodb://medModernaAdmin:kiarakiara@2.223.69.193:27017/medmoderna-db"
-
-
+  url: "mongodb+srv://root:root@cluster0.ninww.mongodb.net/medmoderna-db2"
 };

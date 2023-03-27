@@ -4,8 +4,9 @@ module.exports = auth => {
 
   var router = require("express").Router();
 
-  router.route('/register').post(register)
+  router.route('/signup').post(register)
   router.route('/login').post(login)
 
   auth.use("/api/auth", router);
+
 };
