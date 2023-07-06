@@ -18,7 +18,7 @@ const initialSetup = require("./app/libs/initialSetup")
 const corsOptions = {
   origin: '*',
   // origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.1.150:3000"],
-    credentials: false
+    credentials: true
 
 };
 initialSetup.createProductCategories().then();
