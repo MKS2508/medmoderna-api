@@ -16,10 +16,9 @@ const app = express();
 const initialSetup = require("./app/libs/initialSetup")
 
 const corsOptions = {
-  origin: '*',
-  // origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.1.150:3000"],
+  //origin: '*',
+  origin: ["https://medmoderna.vercel.app","http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.1.150:3000"],
     credentials: true
-
 };
 initialSetup.createProductCategories().then();
 app.use(cookieParser());
