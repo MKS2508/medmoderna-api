@@ -62,9 +62,10 @@ const PORT = process.env.PORT || 5000;
 
 // Configura HTTPS y las rutas SSL
 const httpsOptions = {
-    key: fs.readFileSync('./medicinamodernagrow.cer'),
-    cert: fs.readFileSync('./_.medicinamodernagrow.key')
+    key: fs.readFileSync('./_.medicinamodernagrow.key'), // clave privada
+    cert: fs.readFileSync('./medicinamodernagrow.cer') // certificado
 }
+
 
 const server = https.createServer(httpsOptions, app).listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);

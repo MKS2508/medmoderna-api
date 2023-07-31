@@ -1,21 +1,28 @@
-# Utiliza una imagen base de Node.js 14
-FROM node:14
+LABEL authors="MKS2508"
+# Etapa de construcción
+FROM node:latest AS build
 
-# Establece el directorio de trabajo
 WORKDIR /app
 
-# Copia el archivo package.json al directorio de trabajo
-COPY package.json ./
+# Clona el repositorio
+RUN git clone https://github.com/MKS2508/medmoderna-api.git .
 
-# Instala pm2 de manera global y las dependencias del proyecto
-RUN npm -g install pm2
+# Instala las dependencias del proyecto
 RUN npm install
 
-# Copia el resto del código de la aplicación al directorio de trabajo
-COPY . .
+# Etapa de producción
+FROM node:14-alpine
 
-# Expone el puerto 3000 para que la aplicación sea accesible desde fuera del contenedor
-EXPOSE 3000
+WORKDIR /app
 
-# Inicia la aplicación usando pm2-runtime
-CMD ["pm2-runtime", "server.js"]
+# Instala PM2 globalmente
+RUN npm install -g pm2
+
+# Copia desde la etapa de construcción
+COPY --from=build /app .
+
+# Expone el puerto 5000
+EXPOSE 5000
+
+# Levanta la aplicación con PM2
+CMD ["pm2-runtime", "start", "server.js"]
