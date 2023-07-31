@@ -71,6 +71,15 @@ require("./app/routes/auth.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
+
+// Configura HTTPS y las rutas SSL
+const httpsOptions = {
+    key: fs.readFileSync('./_.medicinamodernagrow.key'), // clave privada
+    cert: fs.readFileSync('./medicinamodernagrow.cer') // certificado
+}
+
+
+const server = https.createServer(httpsOptions, app).listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}.`);
+
 });
