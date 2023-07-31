@@ -31,6 +31,8 @@ app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = require("./app/models");
+const {readFileSync} = require("fs");
+const {createServer} = require("https");
 db.mongoose
   .connect(db.url, {
     useNewUrlParser: true,
@@ -74,12 +76,12 @@ const PORT = process.env.PORT || 5000;
 
 // Configura HTTPS y las rutas SSL
 const httpsOptions = {
-    key: fs.readFileSync('./_.medicinamodernagrow.shop_private_key.key'), // clave privada
-    cert: fs.readFileSync('./medicinamodernagrow.cer') // certificado
+    key: readFileSync('./_.medicinamodernagrow.shop_private_key.key'), // clave privada
+    cert: readFileSync('./medicinamodernagrow.cer') // certificado
 }
 
 
-const server = https.createServer(httpsOptions, app).listen(PORT, () => {
+const server = createServer(httpsOptions, app).listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 
 });

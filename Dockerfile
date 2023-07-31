@@ -1,4 +1,3 @@
-LABEL authors="MKS2508"
 # Etapa de construcción
 FROM node:latest AS build
 
@@ -26,3 +25,4 @@ EXPOSE 5000
 
 # Levanta la aplicación con PM2
 CMD ["pm2-runtime", "start", "server.js"]
+LABEL authors="MKS2508"
