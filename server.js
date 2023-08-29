@@ -76,8 +76,8 @@ const PORT = process.env.PORT || 8080;
 
 // Configura HTTPS y las rutas SSL
 const httpsOptions = {
-    key: readFileSync('./_.medicinamodernagrow.shop_private_key.key'), // clave privada
-    cert: readFileSync('./medicinamodernagrow.cer') // certificado
+    key: readFileSync('/_.medicinamodernagrow.shop_private_key.key'), // clave privada
+    cert: readFileSync('/medicinamodernagrow.cer') // certificado
 }
 
 
