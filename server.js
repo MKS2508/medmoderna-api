@@ -78,6 +78,5 @@ const PORT = process.env.PORT || 8080;
 
 
 
-const server = createServer(app);
 
-module.exports=  server;
+module.exports=  app;
