@@ -192,6 +192,7 @@ exports.getProductsByCategory = async (req, res) => {
     const cat = await productCategory.findOne({name: req.params.category});
     const fixProducts = async (productPaginate) => {
 
+
         let products = productPaginate.docs
         let productsFixed = [];
         console.log({cat2: cat})
