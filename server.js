@@ -75,13 +75,10 @@ require("./app/routes/auth.routes")(app);
 const PORT = process.env.PORT || 8080;
 
 // Configura HTTPS y las rutas SSL
-const httpsOptions = {
-    key: readFileSync('/_.medicinamodernagrow.shop_private_key.key'), // clave privada
-    cert: readFileSync('/medicinamodernagrow.cer') // certificado
-}
 
 
-const server = createServer(httpsOptions, app).listen(PORT, () => {
+
+const server = createServer(app).listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 
 });
